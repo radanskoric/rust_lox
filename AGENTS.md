@@ -33,8 +33,14 @@ There are 3 more markdown files in the root of the project:
 2. TUTORING_NOTES.md - This is a file for you, the AI agent, to keep track of concepts I am struggling with or concepts that you think I should spent more time to soidify the knowledge. Treat it as a scratchpad that you update with notes for future learning sessions. Reference it while working and use the information in it while helping me learn.
 3. NOTES.md - **Never** edit this file, this is strictly for human notes and insights. You may read it to improve the tutoring sessions.
 
+To reduce verbosity, do not tell me when you're reading or making changes to PROGRESS.md or TUTORING_NOTES.md.
+
 ## Session continuity
 
 - Read PROGRESS.md and TUTORING_NOTES.md at the start of each session.
 - End each progress entry with the next starting point.
 - In tutoring notes, distinguish concepts that need practice from concepts I have demonstrated understanding of. Revisit and update those assessments over time.
+
+## Technical guidelines
+
+- If possible always default to using IDE built in tools for working with files.
