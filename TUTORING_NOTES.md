@@ -8,9 +8,11 @@
 ## Concepts needing practice
 
 - Built-in types versus the standard-library prelude: distinction introduced while discussing C's common headers; understanding not yet assessed (2026-10-22).
+- Derived `Debug`, compile-time macro generation versus runtime reflection, and `stringify!` operating on source tokens: explained in response to Radan's opcode-name question; understanding not yet assessed (2026-10-23).
 
 ## Tutoring pacing
 
+- Radan values expressiveness from his Ruby background and explicitly wants to explore expressive Rust designs, including macros. Treat this as part of the learning goals; weigh abstractions by their learning value as well as implementation simplicity. Retain the chosen automatic opcode formatting and defer snake case until a multiword opcode arises (2026-10-23).
 - Anchor explanations in the section Radan has read. The enum-versus-byte-stream discussion introduced operands from 14.5.3 while Radan was at 14.3.1; defer the representation decision until the relevant material arises. Distinguish the book's explicit claims from Rust-specific comparisons (2026-10-22).
 - Session ended after section 14.3.1; resume at 14.4. Do not treat the open representation choice as a correctness defect in the current implementation or a prerequisite to continuing (2026-10-22).
 
@@ -27,3 +29,7 @@ Prior completion of the book's earlier parts is background, not an assessment fr
 - Identifies `Vec` as Rust's standard dynamic array, avoiding a custom implementation of the book's C allocation machinery (2026-10-22).
 - Independently proposes data-carrying enum variants to represent instructions with operands; correctly recognizes that Rust enums can contain payloads (2026-10-22).
 - Correctly explains uniform enum element size accommodating the largest variant. Connected this to the memory tradeoff between typed instruction vectors and variable-length packed bytecode; exact layout may include discriminant and padding or compiler optimizations (2026-10-22).
+- Implemented the section 14.4 disassembler using borrowed iteration, `enumerate()`, zero-padded indices, and a match returning an opcode name. Execution and formatting checks pass (2026-10-23).
+- Correctly explains that safe Rust's typed enum prevents constructing an unknown opcode, removing the need for an unknown-opcode branch in the current disassembler. Explained the additional protection from exhaustive matching when adding new variants (2026-10-23).
+- Successfully applied derived `Debug` and debug formatting to the opcode enum. Introduced `format!` for producing an owned string and `to_uppercase()` for transforming it; transformation not yet reviewed (2026-10-23).
+- Independently recognized that uppercasing alone cannot produce underscore-separated labels from multiword enum variants, and investigated a case-conversion crate (2026-10-23).

@@ -56,3 +56,30 @@ Next starting point: Continue chapter 14.3 with the chunk representation; module
 - Current implementation: `main` returns `ExitCode::SUCCESS`, the `chunk` module is declared, `OpCode` has a `Return` variant, and `Chunk` stores `Vec<OpCode>`. No disassembler or operand-bearing instruction has been implemented yet.
 
 Next starting point: Section 14.4, Disassembling Chunks. Revisit operand representation when section 14.5.3 introduces it, without requiring an advance design decision.
+
+## 2026-10-23 — Chapter 14.4: disassembling chunks
+
+- Explained that `print!` omits the trailing newline, while `println!` completes the line. Radan's final implementation combines the index and opcode name in one `println!` call.
+- Reviewed the disassembler: constructs a chunk containing `Return`, prints a named header, enumerates borrowed instructions, and maps the opcode to its display name with an exhaustive match.
+- `cargo run --quiet` successfully prints the header and `0000 OP_RETURN`; `cargo fmt --check` passes. No correctness problems found for the current instruction representation and section scope.
+- Accepted instruction indices for the existing `Vec<OpCode>` representation. Keep byte offsets and operand encoding deferred until section 14.5.3.
+- Radan correctly explained that the typed enum cannot represent an unknown opcode in safe Rust: attempting to construct a nonexistent variant will not compile. Reinforced that exhaustive matching also requires handling new variants when the enum grows.
+
+Next starting point: Continue to section 14.5, Constants; revisit operand representation at 14.5.3.
+
+## 2026-10-23 — Follow-up: automatic opcode names
+
+- Radan asked whether macros can derive opcode names without a manually maintained mapping, and whether doing so is advisable.
+- Explained derived `Debug` for diagnostic formatting, including variant names and any payloads, versus deliberately controlled disassembler output such as `OP_RETURN`.
+- Explained compile-time code generation: a derive macro can inspect the enum declaration, or a declarative macro can generate both the enum and name mapping from a single list. Names need not be stored in each enum value.
+- Distinguished `stringify!` converting source tokens from looking up the variant of a runtime value.
+- Recommended derived `Debug` if Rust's diagnostic output is sufficient; retain the small explicit match if exact opcode labels matter. Custom macros or dependencies are unnecessary at this stage. No source code changed; these concepts have been explained but not yet assessed.
+
+- Radan added derived `Debug` and uses debug formatting with an `OP_` prefix, producing `OP_Return`. Explained that debug formatting preserves variant spelling; suggested `format!` to produce a string and `to_uppercase()` before printing with ordinary display formatting. No implementation supplied or changed.
+
+- Clarified that `format!` with debug formatting is the standard way to obtain a debug string; `to_string()` requires `Display`.
+- Radan identified the need to split multiword variant names into snake case. Checked the standard string API and the linked `to_snake_case` documentation: std has case conversion but no built-in PascalCase-to-snake_case conversion. Explained that word boundaries, particularly acronyms, require naming rules; a crate can supply those rules, or explicit labels can avoid the conversion for the disassembler.
+
+- Radan chose to retain the current automatic formatting approach and defer snake case until a multiword opcode needs it. Clarified that exploring Rust's expressiveness, especially through macros, is an explicit learning goal informed by his Ruby background. Support that exploration without repeatedly steering back to explicit mappings solely for implementation simplicity.
+
+Next starting point: Continue to section 14.5, Constants. Revisit snake case when multiword opcodes arise, and operand representation at 14.5.3.

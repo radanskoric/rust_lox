@@ -1,7 +1,8 @@
-enum OpCode {
+#[derive(Debug)]
+pub enum OpCode {
     Return,
 }
 
-struct Chunk {
-    op_codes: Vec<OpCode>,
+pub struct Chunk {
+    pub op_codes: Vec<OpCode>,
 }
