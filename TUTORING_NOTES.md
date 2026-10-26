@@ -7,6 +7,7 @@
 
 ## Concepts needing practice
 
+- Newtype runtime representation: explained zero-cost wrapping versus the explicit layout/ABI guarantee of `repr(transparent)`; this representation distinction has not yet been assessed (2026-10-23).
 - Built-in types versus the standard-library prelude: distinction introduced while discussing C's common headers; understanding not yet assessed (2026-10-22).
 - Derived `Debug`, compile-time macro generation versus runtime reflection, and `stringify!` operating on source tokens: explained in response to Radan's opcode-name question; understanding not yet assessed (2026-10-23).
 
@@ -20,6 +21,21 @@
 
 Prior completion of the book's earlier parts is background, not an assessment from this session.
 
+- Correctly chooses a newtype rather than a type alias to require explicit construction of Value and prevent accidental use of ordinary floats where a Value is expected (2026-10-23).
+- Correctly defines Value using a single-field tuple struct wrapping `f64` (2026-10-23).
+- Correctly applied public visibility to both Value and its tuple field, allowing direct construction from sibling modules once module wiring is in place (2026-10-26).
+- After discussing the child-module lookup error, correctly identified main.rs as the declaration location that makes chunk and value sibling modules (2026-10-26).
+- Correctly declared value at the crate root and used a crate-root import in chunk.rs; module resolution now succeeds (2026-10-26).
+- Changed add_constant to accept Value and store it directly, enforcing explicit wrapping at the caller (2026-10-26).
+- Added a constructor to initialize Chunk's private constant pool and used it from main, resolving the struct privacy compilation error; opcode initialization still needs correction (2026-10-26).
+- Resolved the ignored-constructor-argument issue by deliberately constructing an empty Chunk and appending instructions through write. Kept storage private and moved disassembly into an immutable method. Execution confirms Return then Constant referring to pool index 0 (2026-10-26).
+- Correctly explains that Chunk's borrowed name must remain valid for the chunk's lifetime. Clarified validity for the duration the borrow is needed and that annotations do not extend the owner's lifetime; current string literal has static lifetime (2026-10-26).
+- Independently identified the need to resolve a constant-pool index to its value for useful disassembler output (2026-10-26).
+- Correctly changed read_constant's return type and indexed expression to borrow Value. Compiler confirms the move error is resolved without cloning or explicit lifetime annotations; lifetime elision was explained but not independently assessed (2026-10-26).
+- Correctly identifies f64 as already supporting numeric display while its Value newtype does not automatically inherit Display (2026-10-26).
+- Implemented appending a constant and returning its zero-based index with Vec length minus one, using mutable self borrowing and usize appropriately; execution now confirms the first index is zero and its value is 1.2 (2026-10-26).
+- Correctly implemented context-aware constant formatting and independently implemented Display for Value by delegating to f64. Execution prints the constant index and value without warnings; formatting check passes (2026-10-26).
+- Correctly recognized that Display for Value removes the need for disassembly to access its numeric field directly, and updated the call to format the borrowed Value itself. Execution confirms the same correct output (2026-10-26).
 - Recognizes zero as the conventional successful process exit status and recalls Rust's tail-expression return behavior (2026-10-22).
 - Recalls that omitting a function return type means no meaningful return value; initially used C's `void` terminology. Introduced Rust's unit type (`()`) (2026-10-22).
 - Correctly reasons that an integer tail expression causes a type mismatch in a function returning unit (2026-10-22).

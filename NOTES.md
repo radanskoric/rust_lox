@@ -1,0 +1,2 @@
+- Wrapping a single value in a new type is called the newtype pattern.
+- `mod` keyword needs to be declared at top level of the crate (e.g. in `main.rs`) and the other modules in the same craete can reference all other submoduels by path starting with `crate::`.

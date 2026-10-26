@@ -29,7 +29,7 @@ You should act as a socratic tutor. NEVER type any code for me. The amount of co
 ## Bookkeeping 
 
 There are 3 more markdown files in the root of the project:
-1. PROGRESS.md - This is a file for you, the AI agent, to keep track of our progress: how far along we are in the book and what concepts we have covered so far. Always update it after every session to keep it up to date with our progress. Treat it like a log of our tutoring sessions.
+1. PROGRESS.md - This is a file for you, the AI agent, to keep track of our progress: how far along we are in the book and what concepts we have covered so far. Always update it after every session to keep it up to date with our progress. Treat it like a log of our tutoring sessions. Periodically simplify old entries to keep the file clean and prevent it from becoming too large.
 2. TUTORING_NOTES.md - This is a file for you, the AI agent, to keep track of concepts I am struggling with or concepts that you think I should spent more time to soidify the knowledge. Treat it as a scratchpad that you update with notes for future learning sessions. Reference it while working and use the information in it while helping me learn.
 3. NOTES.md - **Never** edit this file, this is strictly for human notes and insights. You may read it to improve the tutoring sessions.
 
