@@ -10,6 +10,7 @@ pub enum OpCode {
 pub struct Chunk<'a> {
     name: &'a str,
     op_codes: Vec<OpCode>,
+    line_numbers: Vec<usize>,
     values: ValueArray,
 }
 
@@ -18,12 +19,14 @@ impl<'a> Chunk<'a> {
         Self {
             name,
             op_codes: Vec::new(),
+            line_numbers: Vec::new(),
             values: ValueArray(Vec::new()),
         }
     }
 
-    pub fn write(&mut self, op_code: OpCode) {
+    pub fn write(&mut self, op_code: OpCode, line_number: usize) {
         self.op_codes.push(op_code);
+        self.line_numbers.push(line_number);
     }
 
     pub fn add_constant(&mut self, value: Value) -> usize {
@@ -37,15 +40,23 @@ impl<'a> Chunk<'a> {
 
     pub fn disassemble(&self) {
         println!("== {} ==", self.name);
+        let mut last_line = 0;
         for (i, op_code) in self.op_codes.iter().enumerate() {
+            print!("{:04} ", i);
+            let line = self.line_numbers[i];
+            if i == 0 || line != last_line {
+                print!("{:4} ", line);
+            } else {
+                print!("   | ");
+            }
+            last_line = line;
             match op_code {
                 OpCode::Constant(constant) => println!(
-                    "{:04} OP_CONSTANT {} => {}",
-                    i,
+                    "OP_CONSTANT {} => {}",
                     constant,
                     self.read_constant(*constant)
                 ),
-                _ => println!("{:04} OP_{}", i, format!("{:?}", op_code).to_uppercase()),
+                _ => println!("OP_{}", format!("{:?}", op_code).to_uppercase()),
             }
         }
     }

@@ -49,3 +49,10 @@ Prior completion of the book's earlier parts is background, not an assessment fr
 - Correctly explains that safe Rust's typed enum prevents constructing an unknown opcode, removing the need for an unknown-opcode branch in the current disassembler. Explained the additional protection from exhaustive matching when adding new variants (2026-10-23).
 - Successfully applied derived `Debug` and debug formatting to the opcode enum. Introduced `format!` for producing an owned string and `to_uppercase()` for transforming it; transformation not yet reviewed (2026-10-23).
 - Independently recognized that uppercasing alone cannot produce underscore-separated labels from multiword enum variants, and investigated a case-conversion crate (2026-10-23).
+
+## Section 14.6 review — 2026-10-27
+
+- Demonstrated in implementation: associates each typed instruction with a source line through write; displays the first line explicitly and uses a marker only for consecutive equal lines. The initial-index check also handles a first line of zero correctly.
+- Needs follow-up: a Constant output arm changed from println to print, leaving its row unterminated. Ask about the output of Constant followed by Return to revisit row termination; no conclusion about conceptual difficulty until Radan responds.
+
+- Follow-up assessment (2026-10-27): resolved the row-termination concern. Radan correctly predicted the merged output, restored println for Constant, and reordered the example to exercise Constant followed by Return. Execution confirms correct separate rows. This demonstrates understanding of print versus println; no further practice needed on this issue currently.

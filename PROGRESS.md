@@ -161,3 +161,16 @@ Next starting point: Radan will implement context-aware constant formatting in C
 - Checked section 14.5 against the author's book source and confirmed completion for the chosen Rust adaptation: numeric values, growable constant pool, add-and-return-index, constant instructions carrying pool indices, and value-aware disassembly. Explicitly retained the distinction from the book's packed byte stream: typed instructions use instruction indices, not byte offsets.
 
 Next starting point: Section 14.6, Line Information. Associate instructions with source lines and display that information in the disassembler.
+
+## 2026-10-27 — Section 14.6: line information review
+
+- Reviewed the new parallel line-number vector and write method recording one source line per typed instruction. Private storage and the shared write method preserve matching lengths.
+- First-instruction handling and comparison with the immediately preceding line correctly implement the line-number/repeated-line display. Retained instruction indices for the chosen typed representation.
+- Found one output regression: the Constant match arm uses print without a newline, so a following instruction would run onto its row; the current final Constant also leaves output unterminated. Asked Radan to reason about a Constant followed by Return before giving a fix.
+- cargo run succeeds and demonstrates repeated-line formatting; cargo test succeeds with zero tests; cargo fmt -- --check passes. Changed-line and first-line-zero paths were inspected but not exercised.
+
+Next starting point: Radan will reason through the missing instruction-row newline and correct it; then verify same-line and changed-line output before closing section 14.6.
+
+- Follow-up: Radan correctly predicted that Return after Constant would appear on the same row. Changed the constant branch back to println and reordered the sample to Constant followed by Return. Execution now confirms separate rows and the repeated-line marker; formatting check passes. No remaining review findings for section 14.6; changed-line behavior was verified by inspection only.
+
+Next starting point: Chapter 14 is complete through section 14.6 for the chosen typed instruction representation. Continue with chapter 14's challenges if desired, or chapter 15, A Virtual Machine.
