@@ -38,26 +38,54 @@ impl<'a> Chunk<'a> {
         &self.values.0[index]
     }
 
-    pub fn disassemble(&self) {
-        println!("== {} ==", self.name);
+    pub fn disassemble(&self, output: &mut impl std::io::Write) {
+        writeln!(output, "== {} ==", self.name).expect("failed to write chunk header");
         let mut last_line = 0;
         for (i, op_code) in self.op_codes.iter().enumerate() {
-            print!("{:04} ", i);
+            write!(output, "{:04} ", i).expect("failed to write op code index");
             let line = self.line_numbers[i];
             if i == 0 || line != last_line {
-                print!("{:4} ", line);
+                write!(output, "{:4} ", line).expect("failed to write line number");
             } else {
-                print!("   | ");
+                write!(output, "   | ").expect("failed to write line number");
             }
             last_line = line;
             match op_code {
-                OpCode::Constant(constant) => println!(
+                OpCode::Constant(constant) => writeln!(
+                    output,
                     "OP_CONSTANT {} => {}",
                     constant,
                     self.read_constant(*constant)
-                ),
-                _ => println!("OP_{}", format!("{:?}", op_code).to_uppercase()),
+                )
+                .expect("failed to write constant op code"),
+                _ => writeln!(output, "OP_{}", format!("{:?}", op_code).to_uppercase())
+                    .expect("failed to write op code"),
             }
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::Chunk;
+    use super::OpCode;
+    use super::Value;
+
+    #[test]
+    fn disassembles_chunk_with_constant() {
+        let mut chunk = Chunk::new("test chunk");
+        let const_index = chunk.add_constant(Value(1.2));
+        chunk.write(OpCode::Constant(const_index), 123);
+        chunk.write(OpCode::Return, 123);
+        let mut output = Vec::new();
+        chunk.disassemble(&mut output);
+        assert_eq!(
+            String::from_utf8(output).unwrap(),
+            concat!(
+                "== test chunk ==\n",
+                "0000  123 OP_CONSTANT 0 => 1.2\n",
+                "0001    | OP_RETURN\n"
+            )
+        );
     }
 }

@@ -174,3 +174,35 @@ Next starting point: Radan will reason through the missing instruction-row newli
 - Follow-up: Radan correctly predicted that Return after Constant would appear on the same row. Changed the constant branch back to println and reordered the sample to Constant followed by Return. Execution now confirms separate rows and the repeated-line marker; formatting check passes. No remaining review findings for section 14.6; changed-line behavior was verified by inspection only.
 
 Next starting point: Chapter 14 is complete through section 14.6 for the chosen typed instruction representation. Continue with chapter 14's challenges if desired, or chapter 15, A Virtual Machine.
+
+## 2026-10-27 — Unit testing refresher before Chapter 15
+
+- Radan requested a syntax example for testing Value's Display implementation, explicitly allowing an example for this refresher; source files remain for Radan to edit.
+- Introduced a same-file test module gated by cfg(test), importing Value from its parent, a test function marked with test, and assert_eq on the formatted string. Explained running tests with cargo test.
+- Understanding and implementation are not yet assessed; Radan intends to apply the pattern to Chunk independently.
+
+Next starting point: Review Radan's Value/Chunk tests and discuss any testing questions before moving to Chapter 15.
+
+- Follow-up: Value's test is present and matches the example; independent application is not yet assessed. Radan identified the need to observe disassembler output and proposed accepting an output destination. Recommended an explicit std::io::Write destination, using stdout in normal execution and Vec<u8> in tests, rather than an optional destination or stdout redirection. Raised write-error handling as the next reasoning question.
+
+Next starting point: Discuss the disassembler's return type for output failures, then let Radan implement writer-based output and its test.
+
+- Radan deliberately chose to panic on output failures for now. Explained keeping the unit return and using expect on write results.
+- Radan correctly explained the separate borrow requirements: disassembly reads the chunk but modifies the output target. Suggested implementing the mutable writer parameter and replacing printing macros; no source code supplied or changed.
+
+Next starting point: Review Radan's writer-based disassembler and in-memory output test, including trait imports and write-result handling.
+
+- Radan implemented disassemble with a mutable impl std::io::Write reference and expect on write results; main supplies a mutable stdout handle. The Chunk test is still an unfinished draft, so no test success is claimed.
+- Explained impl Trait versus a named generic bound and dyn Trait, then stdout handle construction. Follow-up question concerns why the call needs an explicit mutable borrow while writing inside the method does not: distinguished the owned handle in main from the already-borrowed parameter, and method receiver automatic borrowing/reborrowing used by the formatting macros. Understanding not yet assessed.
+
+Next starting point: Check understanding of the output parameter's reference type, then finish and review the in-memory disassembly test.
+
+- Radan correctly identified that the mutable reference has a distinct type from the underlying value. Clarified terminology: &mut T is the reference type; borrowing creates the reference.
+
+Next starting point: Finish and review the in-memory disassembly test; reference-type distinction is understood.
+
+- Completed the unit-testing refresher. Radan independently finished the Chunk test using a Vec<u8> output target, String::from_utf8, and concat! for readable expected rows with explicit newlines.
+- Reviewed final tests: Value display and Chunk disassembly both pass under cargo test (2 passed). The disassembly assertion covers the header, constant index/value, separate instruction rows, and repeated source-line marker.
+- Explained UTF-8 conversion returning Result and multiline string whitespace; Radan applied concat! correctly. Radan is satisfied with the refresher and plans to move to Chapter 15.
+
+Next starting point: Chapter 15, A Virtual Machine, after Radan reads the chapter; begin reviewing his implementation at section 15.1.

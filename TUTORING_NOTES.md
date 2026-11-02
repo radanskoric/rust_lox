@@ -21,6 +21,10 @@
 
 Prior completion of the book's earlier parts is background, not an assessment from this session.
 
+- Independently applied the same-file unit-test pattern to Chunk, importing parent-module items, building a chunk, and asserting exact disassembly output. Both Value and Chunk tests pass under cargo test (2026-10-27).
+- Implemented a mutable impl std::io::Write output parameter with explicit expect handling, stdout at the application call site, and Vec<u8> in the test. Correctly uses String::from_utf8 and concat! with explicit newlines to compare the output. Unit-testing refresher complete; no current difficulty identified (2026-10-27).
+- Correctly identifies a mutable reference as having its own type, distinct from the underlying value's type, explaining the difference between the stdout caller variable and disassemble's output parameter. Automatic method borrowing/reborrowing has been explained but not independently assessed (2026-10-27).
+- Correctly explains why disassembly borrows the chunk immutably and its output target mutably: only the output target is modified. Deliberately accepts panicking on output failures for now; writer implementation remains to be reviewed (2026-10-27).
 - Correctly chooses a newtype rather than a type alias to require explicit construction of Value and prevent accidental use of ordinary floats where a Value is expected (2026-10-23).
 - Correctly defines Value using a single-field tuple struct wrapping `f64` (2026-10-23).
 - Correctly applied public visibility to both Value and its tuple field, allowing direct construction from sibling modules once module wiring is in place (2026-10-26).

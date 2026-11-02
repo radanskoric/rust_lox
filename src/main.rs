@@ -8,7 +8,8 @@ fn main() -> ExitCode {
     let const_index = chunk.add_constant(value::Value(1.2));
     chunk.write(chunk::OpCode::Constant(const_index), 123);
     chunk.write(chunk::OpCode::Return, 123);
-    chunk.disassemble();
+    let mut output = std::io::stdout();
+    chunk.disassemble(&mut output);
 
     ExitCode::SUCCESS
 }
