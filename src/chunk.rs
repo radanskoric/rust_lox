@@ -1,7 +1,7 @@
 use crate::value::Value;
 use crate::value::ValueArray;
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub enum OpCode {
     Return,
     Constant(usize),
@@ -27,6 +27,10 @@ impl<'a> Chunk<'a> {
     pub fn write(&mut self, op_code: OpCode, line_number: usize) {
         self.op_codes.push(op_code);
         self.line_numbers.push(line_number);
+    }
+
+    pub fn get(&self, index: usize) -> Option<&OpCode> {
+        self.op_codes.get(index)
     }
 
     pub fn add_constant(&mut self, value: Value) -> usize {
@@ -70,6 +74,18 @@ mod tests {
     use super::Chunk;
     use super::OpCode;
     use super::Value;
+
+    #[test]
+    fn get_returns_op_code_at_index() {
+        let mut chunk = Chunk::new("test chunk");
+        let const_index = chunk.add_constant(Value(1.2));
+        chunk.write(OpCode::Constant(const_index), 123);
+        chunk.write(OpCode::Return, 123);
+        let value = chunk.get(0);
+        assert_eq!(*value.unwrap(), OpCode::Constant(const_index));
+        let value = chunk.get(1);
+        assert_eq!(*value.unwrap(), OpCode::Return);
+    }
 
     #[test]
     fn disassembles_chunk_with_constant() {

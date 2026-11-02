@@ -206,3 +206,61 @@ Next starting point: Finish and review the in-memory disassembly test; reference
 - Explained UTF-8 conversion returning Result and multiline string whitespace; Radan applied concat! correctly. Radan is satisfied with the refresher and plans to move to Chapter 15.
 
 Next starting point: Chapter 15, A Virtual Machine, after Radan reads the chapter; begin reviewing his implementation at section 15.1.
+
+## 2026-11-02 — Chapter 15.1.1: instruction pointer
+
+- Located the book's `Chunk.code` in chapter 14.3.1: its dynamically allocated byte array holds bytecode; assigning it to `vm.ip` starts execution at its first byte. Related this to the current Rust instruction vector without prescribing an implementation.
+
+Next starting point: Continue section 15.1.1 and discuss how an instruction position relates to the Rust chunk representation.
+
+- Radan identified a zero-based instruction index and proposed an iterator as an idiomatic alternative. Discussed sequential iteration and borrowing, and posed a question about retaining access to the chunk's constants.
+
+Next starting point: Explore the iterator's borrow and how the VM can access constants, then compare with an index as needed.
+
+- Radan correctly identified that multiple immutable borrows can coexist. Discussed that ownership alone does not prevent the owner from changing a chunk, while an active immutable borrow restricts mutation; raised the challenge of storing an iterator borrowing an owned field.
+
+Next starting point: Explore why storing an owned chunk alongside an iterator borrowing it is challenging in safe Rust.
+
+- Radan identified that future control-flow instructions can change the instruction position, making an index a natural fit. Discussed sequential iterators versus directly setting an index; no implementation prescribed.
+
+Next starting point: Continue implementing section 15.1.1 with an instruction index and review the resulting VM design.
+
+- Radan chose the name `ip` for continuity with the book and is considering whether the VM should own or borrow its chunk. Explained that both are valid and recommended borrowing for the book's current temporary execution relationship.
+
+Next starting point: Consider the chunk's lifetime relative to interpretation, then review the VM implementation.
+
+- Radan correctly reasoned that the chunk created in main can outlive interpretation, supporting an immutable borrow by the VM. Clarified that the value must remain alive and borrowed for the needed period, rather than necessarily the entire program.
+
+Next starting point: Implement and review the VM borrowing the chunk and tracking `ip`.
+
+- Started review of the section 15.1.1 implementation. `cargo test` reports five compilation errors: two lifetime specifiers, a tuple-variant pattern, and two match arms expecting an Option where `Chunk::get` returns a reference. Starting with the lifetime of the chunk reference; further errors and warnings remain to be worked through.
+
+Next starting point: Discuss the lifetime relationship between VM and its borrowed chunk, then recompile and address remaining errors one at a time.
+
+- Radan added a lifetime parameter to VM and its chunk reference, resolving that missing lifetime. The chunk's own name lifetime and the VM impl lifetime remain unspecified; compiler still reports five errors including unrelated match issues.
+
+Next starting point: Relate the chunk's borrowed name lifetime to the VM's chunk borrow, then address the impl and subsequent compiler errors.
+
+- Radan correctly reasoned about transitive validity of the chunk name and VM borrow, and added lifetime annotations to VM, its impl, and interpret. `cargo test` now reports no lifetime errors and three remaining pattern/type errors.
+
+Next starting point: Resolve the mismatch between Chunk::get's return type and the VM's Option match arms.
+
+- Radan changed Chunk::get to return Option, handled exhaustion with RuntimeError, and fixed the constant pattern. All four tests pass; the test build warns that CompileError is unused. VM advances ip, returns success on Return, and currently prints the constant index as a placeholder. The exhaustion path has not yet been tested.
+
+Next starting point: Ask how to test exhaustion without Return; then discuss the unused CompileError warning and continue chapter 15.
+
+- Reviewed Radan's missing-return test: executes a constant without Return and asserts RuntimeError, covering exhaustion after advancing ip. All five tests pass; unused CompileError warning remains expected.
+
+Next starting point: Continue chapter 15 after section 15.1.1; constant execution currently only prints its pool index.
+
+- Reviewed present test coverage: successful return and execution exhausting a chunk are covered; optional test for stopping at Return before subsequent instructions would distinguish termination from continuing. More constant semantics tests can wait for their implementation.
+
+Next starting point: Optionally test that Return stops execution, then continue chapter 15.
+
+- Reviewed writer parameter threaded from main and tests through interpret to run; six tests pass. Identified that writeln result .ok() silently discards write failures and that the Return test has no instruction after Return, so it does not distinguish stopping from proceeding. Discuss output failure first.
+
+Next starting point: Ask Radan to reason about .ok() on a failing writer, then revisit the Return test's arrangement.
+
+- Radan replaced discarded write errors with expect, consistent with the disassembler, and amended the Return test with a subsequent Constant and an empty-output assertion. All six tests pass; unused CompileError warning remains.
+
+Next starting point: Continue chapter 15 beyond section 15.1.1; implement constant behavior as introduced in the book.

@@ -60,3 +60,9 @@ Prior completion of the book's earlier parts is background, not an assessment fr
 - Needs follow-up: a Constant output arm changed from println to print, leaving its row unterminated. Ask about the output of Constant followed by Return to revisit row termination; no conclusion about conceptual difficulty until Radan responds.
 
 - Follow-up assessment (2026-10-27): resolved the row-termination concern. Radan correctly predicted the merged output, restored println for Constant, and reordered the example to exercise Constant followed by Return. Execution confirms correct separate rows. This demonstrates understanding of print versus println; no further practice needed on this issue currently.
+
+- Chapter 15.1.1: Radan independently proposed both a zero-based instruction index and an iterator; explore iterator borrowing and VM access to the chunk before assessing understanding (2026-11-02).
+- Demonstrated understanding (2026-11-02): multiple immutable borrows can coexist. Revisit distinction between ownership and restrictions imposed by active borrows.
+- Demonstrated understanding (2026-11-02): recognized that VM control flow can move the instruction position beyond sequential iteration and connected that to choosing an index.
+- Demonstrated understanding (2026-11-02): reasoned that the chunk created in main can outlive interpretation, allowing the VM to borrow it.
+- Demonstrated understanding (2026-11-02): reasoned transitively about validity of the chunk name and VM's borrow, and applied lifetime annotations successfully.
