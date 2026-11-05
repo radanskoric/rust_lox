@@ -44,27 +44,43 @@ impl<'a> Chunk<'a> {
 
     pub fn disassemble(&self, output: &mut impl std::io::Write) {
         writeln!(output, "== {} ==", self.name).expect("failed to write chunk header");
-        let mut last_line = 0;
-        for (i, op_code) in self.op_codes.iter().enumerate() {
-            write!(output, "{:04} ", i).expect("failed to write op code index");
-            let line = self.line_numbers[i];
-            if i == 0 || line != last_line {
-                write!(output, "{:4} ", line).expect("failed to write line number");
-            } else {
-                write!(output, "   | ").expect("failed to write line number");
-            }
-            last_line = line;
-            match op_code {
-                OpCode::Constant(constant) => writeln!(
-                    output,
-                    "OP_CONSTANT {} => {}",
-                    constant,
-                    self.read_constant(*constant)
-                )
-                .expect("failed to write constant op code"),
-                _ => writeln!(output, "OP_{}", format!("{:?}", op_code).to_uppercase())
-                    .expect("failed to write op code"),
-            }
+        for (ip, op_code) in self.op_codes.iter().enumerate() {
+            self.disassemble_op_code(ip, op_code, output);
+        }
+    }
+
+    #[cfg(any(feature = "debug-trace-execution", test))]
+    pub fn disassemble_instruction(&self, ip: usize, output: &mut impl std::io::Write) {
+        let op_code = self
+            .op_codes
+            .get(ip)
+            .expect(&format!("Invalid ip provided: {}", ip));
+        self.disassemble_op_code(ip, op_code, output);
+    }
+
+    fn disassemble_op_code(&self, ip: usize, op_code: &OpCode, output: &mut impl std::io::Write) {
+        write!(output, "{:04} ", ip).expect("failed to write op code index");
+        let line = self.line_numbers[ip];
+        let last_line = if ip == 0 {
+            0
+        } else {
+            self.line_numbers[ip - 1]
+        };
+        if ip == 0 || line != last_line {
+            write!(output, "{:4} ", line).expect("failed to write line number");
+        } else {
+            write!(output, "   | ").expect("failed to write line number");
+        }
+        match op_code {
+            OpCode::Constant(constant) => writeln!(
+                output,
+                "OP_CONSTANT {} => {}",
+                constant,
+                self.read_constant(*constant)
+            )
+            .expect("failed to write constant op code"),
+            _ => writeln!(output, "OP_{}", format!("{:?}", op_code).to_uppercase())
+                .expect("failed to write op code"),
         }
     }
 }
@@ -102,6 +118,18 @@ mod tests {
                 "0000  123 OP_CONSTANT 0 => 1.2\n",
                 "0001    | OP_RETURN\n"
             )
+        );
+    }
+
+    #[test]
+    fn disassembles_a_single_instruction() {
+        let mut chunk = Chunk::new("test chunk");
+        chunk.write(OpCode::Return, 123);
+        let mut output = Vec::new();
+        chunk.disassemble_instruction(0, &mut output);
+        assert_eq!(
+            String::from_utf8(output).unwrap(),
+            concat!("0000  123 OP_RETURN\n")
         );
     }
 }

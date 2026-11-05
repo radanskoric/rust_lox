@@ -1,6 +1,5 @@
 use crate::chunk::Chunk;
 use crate::chunk::OpCode;
-use crate::value::Value;
 
 pub struct VM<'a> {
     chunk: Option<&'a Chunk<'a>>,
@@ -30,9 +29,15 @@ impl<'a> VM<'a> {
     }
 
     fn run(&mut self, output: &mut impl std::io::Write) -> InterpretResult {
+        let chunk = self.chunk.as_ref().unwrap();
         loop {
-            match self.chunk.as_ref().unwrap().get(self.ip) {
+            match chunk.get(self.ip) {
                 Some(op) => {
+                    #[cfg(feature = "debug-trace-execution")]
+                    {
+                        chunk.disassemble_instruction(self.ip, output);
+                    }
+
                     self.ip += 1;
                     match op {
                         OpCode::Constant(const_index) => {
@@ -55,6 +60,7 @@ impl<'a> VM<'a> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::value::Value;
 
     #[test]
     fn test_interpret_happy_path() {
@@ -65,6 +71,7 @@ mod tests {
         let mut output = Vec::new();
         let result = VM::new().interpret(&chunk, &mut output);
         assert_eq!(result, InterpretResult::Ok);
+        #[cfg(not(feature = "debug-trace-execution"))]
         assert_eq!(String::from_utf8(output).unwrap(), "OpConstant: 0\n");
     }
 
@@ -76,6 +83,7 @@ mod tests {
         let mut output = Vec::new();
         let result = VM::new().interpret(&chunk, &mut output);
         assert_eq!(result, InterpretResult::RuntimeError);
+        #[cfg(not(feature = "debug-trace-execution"))]
         assert_eq!(String::from_utf8(output).unwrap(), "OpConstant: 0\n");
     }
 
@@ -88,6 +96,9 @@ mod tests {
         let mut output = Vec::new();
         let result = VM::new().interpret(&chunk, &mut output);
         assert_eq!(result, InterpretResult::Ok);
+        #[cfg(not(feature = "debug-trace-execution"))]
         assert_eq!(String::from_utf8(output).unwrap(), "");
+        #[cfg(feature = "debug-trace-execution")]
+        assert_eq!(String::from_utf8(output).unwrap(), "0000    0 OP_RETURN\n");
     }
 }
