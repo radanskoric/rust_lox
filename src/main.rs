@@ -1,5 +1,8 @@
 use std::process::ExitCode;
 
+#[macro_use]
+mod xwrite;
+
 mod chunk;
 mod value;
 mod vm;

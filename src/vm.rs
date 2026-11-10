@@ -41,8 +41,7 @@ impl<'a> VM<'a> {
                 Some(op) => {
                     #[cfg(feature = "debug-trace-execution")]
                     {
-                        writeln!(output, "STACK: {:?}", self.stack)
-                            .expect("failed to write to output");
+                        xwriteln!(output, "STACK: {:?}", self.stack);
                         chunk.disassemble_instruction(self.ip, output);
                     }
 
@@ -53,7 +52,7 @@ impl<'a> VM<'a> {
                         }
                         OpCode::Return => {
                             if let Some(val) = self.stack.pop() {
-                                writeln!(output, "{}", val).expect("failed to write to output")
+                                xwriteln!(output, "{}", val)
                             }
                             return InterpretResult::Ok;
                         }

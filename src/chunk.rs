@@ -43,7 +43,7 @@ impl<'a> Chunk<'a> {
     }
 
     pub fn disassemble(&self, output: &mut impl std::io::Write) {
-        writeln!(output, "== {} ==", self.name).expect("failed to write chunk header");
+        xwriteln!(output, "== {} ==", self.name);
         for (ip, op_code) in self.op_codes.iter().enumerate() {
             self.disassemble_op_code(ip, op_code, output);
         }
@@ -59,7 +59,7 @@ impl<'a> Chunk<'a> {
     }
 
     fn disassemble_op_code(&self, ip: usize, op_code: &OpCode, output: &mut impl std::io::Write) {
-        write!(output, "{:04} ", ip).expect("failed to write op code index");
+        xwrite!(output, "{:04} ", ip);
         let line = self.line_numbers[ip];
         let last_line = if ip == 0 {
             0
@@ -67,20 +67,18 @@ impl<'a> Chunk<'a> {
             self.line_numbers[ip - 1]
         };
         if ip == 0 || line != last_line {
-            write!(output, "{:4} ", line).expect("failed to write line number");
+            xwrite!(output, "{:4} ", line);
         } else {
-            write!(output, "   | ").expect("failed to write line number");
+            xwrite!(output, "   | ");
         }
         match op_code {
-            OpCode::Constant(constant) => writeln!(
+            OpCode::Constant(constant) => xwriteln!(
                 output,
                 "OP_CONSTANT {} => {}",
                 constant,
                 self.read_constant(*constant)
-            )
-            .expect("failed to write constant op code"),
-            _ => writeln!(output, "OP_{}", format!("{:?}", op_code).to_uppercase())
-                .expect("failed to write op code"),
+            ),
+            _ => xwriteln!(output, "OP_{}", format!("{:?}", op_code).to_uppercase()),
         }
     }
 }
