@@ -1,9 +1,11 @@
 use crate::chunk::Chunk;
 use crate::chunk::OpCode;
+use crate::value::Value;
 
 pub struct VM<'a> {
     chunk: Option<&'a Chunk<'a>>,
     ip: usize,
+    stack: Vec<Value>,
 }
 
 #[derive(Debug, PartialEq)]
@@ -15,7 +17,11 @@ pub enum InterpretResult {
 
 impl<'a> VM<'a> {
     pub fn new() -> Self {
-        Self { chunk: None, ip: 0 }
+        Self {
+            chunk: None,
+            ip: 0,
+            stack: vec![],
+        }
     }
 
     pub fn interpret(
@@ -35,16 +41,20 @@ impl<'a> VM<'a> {
                 Some(op) => {
                     #[cfg(feature = "debug-trace-execution")]
                     {
+                        writeln!(output, "STACK: {:?}", self.stack)
+                            .expect("failed to write to output");
                         chunk.disassemble_instruction(self.ip, output);
                     }
 
                     self.ip += 1;
                     match op {
                         OpCode::Constant(const_index) => {
-                            writeln!(output, "OpConstant: {}", const_index)
-                                .expect("failed to write to output");
+                            self.stack.push(chunk.read_constant(*const_index))
                         }
                         OpCode::Return => {
+                            if let Some(val) = self.stack.pop() {
+                                writeln!(output, "{}", val).expect("failed to write to output")
+                            }
                             return InterpretResult::Ok;
                         }
                     }
@@ -60,7 +70,6 @@ impl<'a> VM<'a> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::value::Value;
 
     #[test]
     fn test_interpret_happy_path() {
@@ -72,7 +81,7 @@ mod tests {
         let result = VM::new().interpret(&chunk, &mut output);
         assert_eq!(result, InterpretResult::Ok);
         #[cfg(not(feature = "debug-trace-execution"))]
-        assert_eq!(String::from_utf8(output).unwrap(), "OpConstant: 0\n");
+        assert_eq!(String::from_utf8(output).unwrap(), "42\n");
     }
 
     #[test]
@@ -83,8 +92,6 @@ mod tests {
         let mut output = Vec::new();
         let result = VM::new().interpret(&chunk, &mut output);
         assert_eq!(result, InterpretResult::RuntimeError);
-        #[cfg(not(feature = "debug-trace-execution"))]
-        assert_eq!(String::from_utf8(output).unwrap(), "OpConstant: 0\n");
     }
 
     #[test]
@@ -99,6 +106,20 @@ mod tests {
         #[cfg(not(feature = "debug-trace-execution"))]
         assert_eq!(String::from_utf8(output).unwrap(), "");
         #[cfg(feature = "debug-trace-execution")]
-        assert_eq!(String::from_utf8(output).unwrap(), "0000    0 OP_RETURN\n");
+        assert_eq!(
+            String::from_utf8(output).unwrap(),
+            concat!("STACK: []\n", "0000    0 OP_RETURN\n")
+        );
+    }
+
+    #[test]
+    fn lone_return_does_nothing() {
+        let mut chunk = Chunk::new("test chunk");
+        chunk.write(OpCode::Return, 0);
+        let mut output = Vec::new();
+        let result = VM::new().interpret(&chunk, &mut output);
+        assert_eq!(result, InterpretResult::Ok);
+        #[cfg(not(feature = "debug-trace-execution"))]
+        assert_eq!(String::from_utf8(output).unwrap(), "");
     }
 }

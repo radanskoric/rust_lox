@@ -38,8 +38,8 @@ impl<'a> Chunk<'a> {
         self.values.0.len() - 1
     }
 
-    pub fn read_constant(&self, index: usize) -> &Value {
-        &self.values.0[index]
+    pub fn read_constant(&self, index: usize) -> Value {
+        self.values.0[index]
     }
 
     pub fn disassemble(&self, output: &mut impl std::io::Write) {
