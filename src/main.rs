@@ -14,7 +14,9 @@ fn main() -> ExitCode {
     chunk.write(chunk::OpCode::Constant(const_index), 123);
     chunk.write(chunk::OpCode::Return, 123);
     let mut output = std::io::stdout();
+    println!("Executing chunk:");
     chunk.disassemble(&mut output);
+    println!("Executing...");
     vm.interpret(&chunk, &mut output);
 
     ExitCode::SUCCESS
