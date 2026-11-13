@@ -7,6 +7,10 @@
 
 ## Concepts needing practice
 
+- Lifetime relationships (2026-11-13): correctly identified that compiled chunks do not borrow source and that source need not live as long as the VM. Needed guidance on elided return lifetimes connecting compiler output to source, and on using a static name lifetime independently of chunk ownership. Revisit with future borrowed token/source representations.
+- Trait method visibility (2026-11-13): imported Write and successfully flushed stdout after explanation; revisit why a trait must be in scope when a new trait-provided method arises. Implementation demonstrated, independent explanation not yet assessed.
+- Reusable VM state (2026-11-13): correctly reasoned that ip must reset and implemented reset in run. Stack cleanup after failure remains an open question; do not treat successful repeated-run coverage as proving cleanup.
+
 - Newtype runtime representation: explained zero-cost wrapping versus the explicit layout/ABI guarantee of `repr(transparent)`; this representation distinction has not yet been assessed (2026-10-23).
 - Built-in types versus the standard-library prelude: distinction introduced while discussing C's common headers; understanding not yet assessed (2026-10-22).
 - Derived `Debug`, compile-time macro generation versus runtime reflection, and `stringify!` operating on source tokens: explained in response to Radan's opcode-name question; understanding not yet assessed (2026-10-23).
@@ -18,6 +22,11 @@
 - Session ended after section 14.3.1; resume at 14.4. Do not treat the open representation choice as a correctness defect in the current implementation or a prerequisite to continuing (2026-10-22).
 
 ## Demonstrated understanding
+
+- Chapter 16.1 (2026-11-13): collected CLI arguments, correctly counted the executable name, implemented prompt flushing, EOF termination, and Result-based file error handling with failure exit status and stderr output.
+- Chapter 16.1 (2026-11-13): reasoned that the compiler should report compilation errors separately from VM runtime errors. Implemented a unit-struct error after discussion of why an empty enum cannot be constructed.
+- Chapter 16.1 (2026-11-13): recognized that a standalone compile function needs no self parameter, and that consuming self prevents VM reuse; changed interpret to borrow mutably. Moved compiled chunks into VM ownership with syntax guidance.
+- Chapter 16.1 (2026-11-13): adapted execution tests to run on prepared chunks without needing a parser and added a two-chunk repeated-run test; 11 tests passed at last verification. Correctly proposed None as a terminating scanner stub.
 
 Prior completion of the book's earlier parts is background, not an assessment from this session.
 

@@ -1,5 +1,18 @@
 # Progress
 
+## 2026-11-13 — Chapter 16.1: CLI and compilation skeleton
+
+- Radan has advanced through chapter 15; reviewed the current arithmetic VM through its tests rather than assessing every intervening book concept.
+- Implemented argument collection and dispatch, REPL prompt flushing and EOF termination, file reading, stderr errors, and unsuccessful exit status on failure. Both CLI paths now call interpret.
+- Separated compilation from interpretation with Result<Chunk, CompilationError> and a unit-struct error; interpret translates compilation failure into InterpretResult::CompileError.
+- Changed the VM from borrowing a caller-owned chunk to owning the compiled chunk. interpret now borrows the VM mutably for reuse; run resets ip before execution.
+- Distinguished the source's temporary lifetime from the chunk's borrowed name. compile now returns a chunk with a static literal name without tying its lifetime to source.
+- Adapted bytecode execution tests to exercise run directly and added repeated-run coverage. Last verified cargo test run: 11 passed. Stack cleanup between interpretations was raised but remains unresolved; current repeated-run test covers successful executions only.
+- Scanner now returns None as a temporary stub, avoiding an infinite compilation loop. Compilation still produces an empty chunk, so interpretation currently reports RuntimeError; meaningful compilation is pending.
+- Bookkeeping was delayed by Plan Mode. Added an explicit requirement to alert Radan immediately when such restrictions prevent updates, and backfilled this session after leaving Plan Mode.
+
+Next starting point: Chapter 16.2. Revisit stack cleanup when handling failed/repeated executions; scanner is a terminating placeholder, not an implemented tokenizer.
+
 ## 2026-10-21 — Preparation session
 
 - Reviewed the repository and clarified the tutoring approach. No implementation exists yet.

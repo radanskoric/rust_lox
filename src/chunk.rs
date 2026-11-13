@@ -3,8 +3,13 @@ use crate::value::ValueArray;
 
 #[derive(Debug, PartialEq)]
 pub enum OpCode {
-    Return,
     Constant(usize),
+    Add,
+    Subtract,
+    Multiply,
+    Divide,
+    Negate,
+    Return,
 }
 
 pub struct Chunk<'a> {

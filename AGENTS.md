@@ -35,6 +35,8 @@ There are 3 more markdown files in the root of the project:
 
 To reduce verbosity, do not tell me when you're reading or making changes to PROGRESS.md or TUTORING_NOTES.md.
 
+Exception: if Plan Mode or another higher-priority restriction prevents required bookkeeping, alert me immediately when the conflict becomes apparent. Explain the restriction and which updates are pending; never silently skip them. Once edits are allowed, apply the pending updates. This alert takes precedence over the instruction to avoid routine bookkeeping announcements.
+
 ## Session continuity
 
 - Read PROGRESS.md and TUTORING_NOTES.md at the start of each session.
